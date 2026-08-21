@@ -4097,3 +4097,2162 @@ function renderWeekly(){
   if(
     !state.weekly.archive.length
   ){
+    archive.textContent=
+      "No completed weeks yet.";
+
+    return;
+
+  }
+
+
+  state.weekly.archive.forEach(
+    winner => {
+
+      const row=
+        document.createElement(
+          "div"
+        );
+
+      row.className=
+        "archive-row";
+
+      row.innerHTML=`
+
+        🏆
+
+        <strong>
+          ${escapeHTML(winner.name)}
+        </strong>
+
+        —
+
+        ${winner.points||0}
+        points
+
+      `;
+
+      archive.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   INDIVIDUAL SOFTOY ACHIEVEMENTS
+   ========================================================= */
+
+const achievementDefinitions = [
+
+  {
+    id:"first50",
+    icon:"🪙",
+    name:"First 50 Points",
+    description:
+      "Get 50 points for the first time.",
+    goal:50
+  },
+
+  {
+    id:"oneHundred",
+    icon:"💯",
+    name:"100!",
+    description:
+      "Get 100 points for the first time.",
+    goal:100
+  },
+
+  {
+    id:"fiveHundred",
+    icon:"🏅",
+    name:"500!",
+    description:
+      "Get 500 points for the first time.",
+    goal:500
+  },
+
+  {
+    id:"fourDigit",
+    icon:"👑",
+    name:"Four-Digit King",
+    description:
+      "Get 1,000 points for the first time.",
+    goal:1000
+  },
+
+  {
+    id:"bronzeWarrior",
+    icon:"🥉",
+    name:"Bronze Warrior",
+    description:
+      "Reach Bronze rank for the first time with at least 10 points.",
+    goal:10
+  },
+
+  {
+    id:"silverMastermind",
+    icon:"🥈",
+    name:"Silver Mastermind",
+    description:
+      "Reach Silver rank for the first time with at least 25 points.",
+    goal:25
+  },
+
+  {
+    id:"goldenLegend",
+    icon:"🥇",
+    name:"Golden Legend",
+    description:
+      "Reach Gold rank for the first time with at least 40 points.",
+    goal:40
+  },
+
+  {
+    id:"rulersVillage",
+    icon:"👑",
+    name:"Rulers of the Softoy Village",
+    description:
+      "Reach Platinum rank for the first time with at least 50 points.",
+    goal:50
+  },
+
+  {
+    id:"chosenOne",
+    icon:"🏆",
+    name:"The Chosen One",
+    description:
+      "Reach 1st place for the first time with at least 50 points.",
+    goal:50
+  },
+
+  {
+    id:"throneIsMine",
+    icon:"📈",
+    name:"The throne is mine!",
+    description:
+      "Be the best improving Softoy in the week.",
+    goal:1
+  },
+
+  /* =====================================================
+     COLOSSEUM ACHIEVEMENTS
+     ===================================================== */
+
+  {
+    id:"unstoppable",
+    icon:"🔥",
+    name:"Unstoppable",
+    description:
+      "Get five Colosseum wins in a row.",
+    goal:5
+  },
+
+  {
+    id:"homeGround",
+    icon:"🏟️",
+    name:"This is my home ground",
+    description:
+      "Get 20 Colosseum wins during that Softoy's career.",
+    goal:20
+  },
+
+  {
+    id:"unexpected",
+    icon:"⚡",
+    name:"Expect the Unexpected",
+    description:
+      "Break a streak of 5 or more from another Softoy.",
+    goal:1
+  }
+
+];
+
+
+/* =========================================================
+   ENSURE ACHIEVEMENT STORAGE
+   ========================================================= */
+
+function ensureAchievements(item){
+
+  if(!item)
+    return;
+
+  if(!item.achievements)
+    item.achievements={};
+
+}
+
+
+/* =========================================================
+   CHECK INDIVIDUAL ACHIEVEMENT
+   ========================================================= */
+
+function achievementUnlocked(
+  item,
+  achievement
+){
+
+  if(!item)
+    return false;
+
+  ensureAchievements(item);
+
+  const points =
+    item.points||0;
+
+
+  /* -----------------------------------------------
+     POINT ACHIEVEMENTS
+     ----------------------------------------------- */
+
+  if(
+    achievement.id==="first50"
+  ){
+
+    return points>=50;
+
+  }
+
+
+  if(
+    achievement.id==="oneHundred"
+  ){
+
+    return points>=100;
+
+  }
+
+
+  if(
+    achievement.id==="fiveHundred"
+  ){
+
+    return points>=500;
+
+  }
+
+
+  if(
+    achievement.id==="fourDigit"
+  ){
+
+    return points>=1000;
+
+  }
+
+
+  /* -----------------------------------------------
+     RANK ACHIEVEMENTS
+     ----------------------------------------------- */
+
+  if(
+    achievement.id==="bronzeWarrior"
+  ){
+
+    return (
+      points>=10 &&
+      rankOf(item)>=26 &&
+      rankOf(item)<=50
+    );
+
+  }
+
+
+  if(
+    achievement.id==="silverMastermind"
+  ){
+
+    return (
+      points>=25 &&
+      rankOf(item)>=11 &&
+      rankOf(item)<=25
+    );
+
+  }
+
+
+  if(
+    achievement.id==="goldenLegend"
+  ){
+
+    return (
+      points>=40 &&
+      rankOf(item)>=4 &&
+      rankOf(item)<=10
+    );
+
+  }
+
+
+  if(
+    achievement.id==="rulersVillage"
+  ){
+
+    return (
+      points>=50 &&
+      rankOf(item)>=2 &&
+      rankOf(item)<=3
+    );
+
+  }
+
+
+  if(
+    achievement.id==="chosenOne"
+  ){
+
+    return (
+      points>=50 &&
+      rankOf(item)===1
+    );
+
+  }
+
+
+  /* -----------------------------------------------
+     WEEKLY ACHIEVEMENT
+     ----------------------------------------------- */
+
+  if(
+    achievement.id==="throneIsMine"
+  ){
+
+    return !!item.achievements.throneIsMine;
+
+  }
+
+
+  /* -----------------------------------------------
+     COLOSSEUM ACHIEVEMENTS
+     ----------------------------------------------- */
+
+  if(
+    achievement.id==="unstoppable"
+  ){
+
+    return (
+      item.colosseumStreak||0
+    )>=5;
+
+  }
+
+
+  if(
+    achievement.id==="homeGround"
+  ){
+
+    return (
+      item.colosseumWins||0
+    )>=20;
+
+  }
+
+
+  if(
+    achievement.id==="unexpected"
+  ){
+
+    return !!item.achievements.unexpected;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =========================================================
+   UPDATE ACHIEVEMENTS
+   ========================================================= */
+
+function updateAchievements(){
+
+  let changed=false;
+
+
+  state.items.forEach(
+    item => {
+
+      ensureAchievements(item);
+
+
+      achievementDefinitions.forEach(
+        achievement => {
+
+          /*
+           * These are handled by their
+           * own special systems.
+           */
+
+          if(
+            achievement.id==="throneIsMine" ||
+            achievement.id==="unexpected"
+          ){
+
+            return;
+
+          }
+
+
+          /*
+           * IMPORTANT:
+           *
+           * Achievements are permanent.
+           *
+           * Once true, they stay true even
+           * if the Softoy later loses points
+           * or changes rank.
+           */
+
+          if(
+            !item.achievements[
+              achievement.id
+            ] &&
+            achievementUnlocked(
+              item,
+              achievement
+            )
+          ){
+
+            item.achievements[
+              achievement.id
+            ]=true;
+
+            changed=true;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  if(changed)
+    save();
+
+}
+
+
+/* =========================================================
+   RENDER PROFILE ACHIEVEMENTS
+   ========================================================= */
+
+function renderProfileAchievements(item){
+
+  const grid =
+    $("profileAchievementGrid");
+
+  if(!grid)
+    return;
+
+  ensureAchievements(item);
+
+  grid.innerHTML="";
+
+
+  achievementDefinitions.forEach(
+    achievement => {
+
+      const unlocked =
+        !!item.achievements[
+          achievement.id
+        ];
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "profile-achievement "+
+        (
+          unlocked
+            ? "unlocked"
+            : "locked"
+        );
+
+
+      card.innerHTML=`
+
+        <div class="profile-achievement-icon">
+
+          ${achievement.icon}
+
+        </div>
+
+        <div class="profile-achievement-name">
+
+          ${achievement.name}
+
+        </div>
+
+        <div class="profile-achievement-lock">
+
+          ${
+            unlocked
+              ? "✓ Unlocked"
+              : "🔒 Locked"
+          }
+
+        </div>
+
+      `;
+
+
+      grid.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   AWARD SPECIAL COLOSSEUM ACHIEVEMENT
+   ========================================================= */
+
+function awardUnexpectedAchievement(
+  winner,
+  loser
+){
+
+  if(!winner || !loser)
+    return;
+
+
+  ensureAchievements(
+    winner
+  );
+
+
+  /*
+   * If the loser had a streak of
+   * five or more before losing,
+   * the winner breaks that streak.
+   */
+
+  if(
+    (loser.colosseumStreak||0)>=5
+  ){
+
+    if(
+      !winner.achievements.unexpected
+    ){
+
+      winner.achievements.unexpected=true;
+
+      save();
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   WEEKLY IMPROVEMENT ACHIEVEMENT
+   ========================================================= */
+
+function awardWeeklyImprovement(){
+
+  if(
+    !state.items.length
+  )
+    return;
+
+
+  let best=null;
+
+
+  state.items.forEach(
+    item => {
+
+      const improvement =
+        item.weeklyPointsGained||0;
+
+
+      if(
+        !best ||
+        improvement>
+        best.improvement
+      ){
+
+        best={
+          item:item,
+          improvement:improvement
+        };
+
+      }
+
+    }
+  );
+
+
+  if(
+    best &&
+    best.improvement>0
+  ){
+
+    ensureAchievements(
+      best.item
+    );
+
+
+    if(
+      !best.item.achievements
+        .throneIsMine
+    ){
+
+      best.item.achievements
+        .throneIsMine=true;
+
+      save();
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   ACHIEVEMENT DETAILS
+   ========================================================= */
+
+function openAchievementDetails(
+  achievement
+){
+
+  if(!achievement)
+    return;
+
+
+  updateAchievements();
+
+
+  const title =
+    $("achievementDetailsTitle");
+
+  const icon =
+    $("achievementDetailsIcon");
+
+  const description =
+    $("achievementDetailsDescription");
+
+  const unlockedList =
+    $("achievementDetailsUnlocked");
+
+
+  if(
+    !title ||
+    !icon ||
+    !description ||
+    !unlockedList
+  ){
+
+    return;
+
+  }
+
+
+  const unlockedItems =
+    state.items.filter(
+      item => {
+
+        ensureAchievements(
+          item
+        );
+
+        return !!item.achievements[
+          achievement.id
+        ];
+
+      }
+    );
+
+
+  title.textContent =
+    achievement.name;
+
+
+  icon.textContent =
+    achievement.icon;
+
+
+  description.textContent =
+    achievement.description;
+
+
+  unlockedList.innerHTML="";
+
+
+  if(
+    !unlockedItems.length
+  ){
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+    empty.className=
+      "archive-row";
+
+    empty.textContent=
+      "🔒 No Softoys have unlocked this achievement yet.";
+
+    unlockedList.appendChild(
+      empty
+    );
+
+  }else{
+
+    unlockedItems.forEach(
+      item => {
+
+        const row =
+          document.createElement(
+            "div"
+          );
+
+
+        row.className=
+          "archive-row";
+
+
+        row.style.cursor=
+          "pointer";
+
+
+        row.innerHTML=`
+
+          🏆
+
+          <strong>
+            ${escapeHTML(item.name)}
+          </strong>
+
+          <br>
+
+          <small>
+            ${item.points||0} points
+          </small>
+
+        `;
+
+
+        row.addEventListener(
+          "click",
+          () => {
+
+            $("achievementDetailsModal")
+              .classList.remove(
+                "show"
+              );
+
+
+            openProfile(item);
+
+          }
+        );
+
+
+        unlockedList.appendChild(
+          row
+        );
+
+      }
+    );
+
+  }
+
+
+  $("achievementDetailsModal")
+    .classList.add(
+      "show"
+    );
+
+}
+
+
+/* =========================================================
+   RENDER ACHIEVEMENTS
+   ========================================================= */
+
+function renderAchievements(){
+
+  updateAchievements();
+
+
+  const list =
+    $("achievementList");
+
+
+  if(!list)
+    return;
+
+
+  list.innerHTML="";
+
+
+  achievementDefinitions.forEach(
+    achievement => {
+
+      const unlockedItems =
+        state.items.filter(
+          item => {
+
+            ensureAchievements(
+              item
+            );
+
+            return !!item.achievements[
+              achievement.id
+            ];
+
+          }
+        );
+
+
+      const unlocked =
+        unlockedItems.length>0;
+
+
+      const box =
+        document.createElement(
+          "div"
+        );
+
+
+      box.className =
+        "achievement "+
+        (
+          unlocked
+            ? "unlocked"
+            : "locked"
+        );
+
+
+      box.innerHTML=`
+
+        <div class="achievement-icon">
+
+          ${achievement.icon}
+
+        </div>
+
+
+        <div class="achievement-content">
+
+          <div class="achievement-title">
+
+            ${achievement.name}
+
+          </div>
+
+
+          <div class="achievement-description">
+
+            ${achievement.description}
+
+          </div>
+
+
+          <button
+            type="button"
+            class="achievement-status"
+            style="
+              border:0;
+              background:transparent;
+              padding:0;
+              text-align:left;
+              cursor:pointer;
+            "
+          >
+
+            ${
+              unlocked
+                ? "✓ Unlocked by "+
+                  unlockedItems.length+
+                  " Softoy"+
+                  (
+                    unlockedItems.length===1
+                      ? ""
+                      : "s"
+                  )
+                : "🔒 Not unlocked yet"
+            }
+
+          </button>
+
+        </div>
+
+
+        ${
+          unlocked
+            ? `
+              <div class="achievement-check">
+
+                ✓
+
+              </div>
+            `
+            : ""
+        }
+
+      `;
+
+
+      const statusButton =
+        box.querySelector(
+          ".achievement-status"
+        );
+
+
+      if(statusButton){
+
+        statusButton.disabled=
+          !unlocked;
+
+
+        if(unlocked){
+
+          statusButton.addEventListener(
+            "click",
+            event => {
+
+              event.stopPropagation();
+
+              openAchievementDetails(
+                achievement
+              );
+
+            }
+          );
+
+        }
+
+      }
+
+
+      list.appendChild(
+        box
+      );
+
+    }
+  );
+
+}
+  /* =========================================================
+   COLOSSEUM
+   ========================================================= */
+
+function makeRandomEventDate(){
+
+  const nowDate=
+    new Date();
+
+  const year=
+    nowDate.getFullYear();
+
+  const month=
+    nowDate.getMonth();
+
+  const days=
+    new Date(
+      year,
+      month+1,
+      0
+    ).getDate();
+
+  const day=
+    1+
+    Math.floor(
+      Math.random()*days
+    );
+
+  return new Date(
+    year,
+    month,
+    day
+  );
+
+}
+
+
+function checkEvent(){
+
+  const today=
+    new Date();
+
+  const key=
+    dateKey(today);
+
+
+  if(
+    state.colosseum.eventDate!==
+    key
+  ){
+
+    /*
+     * Only generate a new event if
+     * the saved event has expired.
+     */
+
+    const saved=
+      state.colosseum.eventDate;
+
+    if(!saved || saved<key){
+
+      const randomDate=
+        makeRandomEventDate();
+
+      state.colosseum.eventDate=
+        dateKey(randomDate);
+
+      save();
+
+    }
+
+  }
+
+
+  state.colosseum.eventActive=
+    state.colosseum.eventDate===
+    key;
+
+
+  if(
+    state.colosseum.eventActive
+  ){
+
+    state.colosseum.summonAvailable=
+      true;
+
+  }
+
+}
+
+
+function cooldownActive(){
+
+  return Date.now() <
+    (
+      state.colosseum
+        .cooldownUntil||0
+    );
+
+}
+
+
+function cooldownText(){
+
+  if(!cooldownActive())
+    return "No active cooldown.";
+
+  const remaining=
+    state.colosseum.cooldownUntil-
+    Date.now();
+
+  const hours=
+    Math.floor(
+      remaining/
+      3600000
+    );
+
+  const minutes=
+    Math.floor(
+      remaining%
+      3600000/
+      60000
+    );
+
+  const seconds=
+    Math.floor(
+      remaining%
+      60000/
+      1000
+    );
+
+  return(
+    "⏱️ Call the Colosseum cooldown: "+
+    hours+"h "+
+    minutes+"m "+
+    seconds+"s"
+  );
+
+}
+
+
+function getItem(id){
+
+  return state.items.find(
+    x => x.id===id
+  );
+
+}
+
+
+/* =========================================================
+   COLOSSEUM RENDER
+   ========================================================= */
+
+function renderColosseum(){
+
+  checkEvent();
+
+
+  $("cooldownText")
+    .textContent=
+    cooldownText();
+
+
+  const button=
+    $("eventButton");
+
+
+  if(
+    cooldownActive()
+  ){
+
+    button.textContent=
+      "⏳ Colosseum Cooling Down";
+
+  }else if(
+    state.colosseum.eventActive
+  ){
+
+    button.textContent=
+      "🏟️ The Colosseum Is Back!";
+
+  }else{
+
+    button.textContent=
+      "📞 Call the Colosseum";
+
+  }
+
+
+  $("p1Name")
+    .textContent=
+    state.colosseum.p1
+      ? getItem(
+          state.colosseum.p1
+        )?.name ||
+        "Not selected"
+      : "Not selected";
+
+
+  $("p2Name")
+    .textContent=
+    state.colosseum.p2
+      ? getItem(
+          state.colosseum.p2
+        )?.name ||
+        "Not selected"
+      : "Not selected";
+
+
+  $("p1Remove")
+    .classList.toggle(
+      "hidden",
+      !state.colosseum.p1
+    );
+
+
+  $("p2Remove")
+    .classList.toggle(
+      "hidden",
+      !state.colosseum.p2
+    );
+
+
+  renderBattleCandidates();
+
+}
+
+
+/* =========================================================
+   OPEN COLOSSEUM
+   ========================================================= */
+
+$("eventButton")
+  .addEventListener(
+    "click",
+    () => {
+
+      checkEvent();
+
+
+      if(
+        cooldownActive()
+      ){
+
+        showToast(
+          cooldownText()
+        );
+
+        return;
+
+      }
+
+
+      state.colosseum.summonAvailable=
+        true;
+
+      state.colosseum.summonStarted=
+        true;
+
+
+      save();
+
+
+      $("battlePanel")
+        .classList.remove(
+          "hidden"
+        );
+
+
+      $("eventButton")
+        .classList.add(
+          "hidden"
+        );
+
+
+      renderColosseum();
+
+    }
+  );
+
+
+/* =========================================================
+   BATTLE SEARCH
+   ========================================================= */
+
+$("battleSearch")
+  .addEventListener(
+    "input",
+    renderBattleCandidates
+  );
+
+
+function renderBattleCandidates(){
+
+  const box=
+    $("battleCandidates");
+
+  box.innerHTML="";
+
+
+  const query=
+    $("battleSearch")
+      .value
+      .trim()
+      .toLowerCase();
+
+
+  const candidates=
+    sortedItems()
+      .filter(
+        item =>
+          item.name
+            .toLowerCase()
+            .includes(query)
+      );
+
+
+  candidates.forEach(
+    item => {
+
+      if(
+        item.id===
+        state.colosseum.p1 ||
+        item.id===
+        state.colosseum.p2
+      )
+        return;
+
+
+      const button=
+        document.createElement(
+          "button"
+        );
+
+      button.className=
+        "settings-button";
+
+      button.textContent=
+        "＋ "+
+        item.name+
+        " — "+
+        (item.points||0)+
+        " points";
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          if(
+            !state.colosseum.p1
+          ){
+
+            state.colosseum.p1=
+              item.id;
+
+          }else if(
+            !state.colosseum.p2
+          ){
+
+            state.colosseum.p2=
+              item.id;
+
+          }else{
+
+            showToast(
+              "Both players are already selected."
+            );
+
+            return;
+
+          }
+
+
+          save();
+
+          renderColosseum();
+
+        }
+      );
+
+
+      box.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   REMOVE PLAYERS
+   ========================================================= */
+
+$("p1Remove")
+  .addEventListener(
+    "click",
+    () => {
+
+      state.colosseum.p1=null;
+
+      save();
+
+      renderColosseum();
+
+    }
+  );
+
+
+$("p2Remove")
+  .addEventListener(
+    "click",
+    () => {
+
+      state.colosseum.p2=null;
+
+      save();
+
+      renderColosseum();
+
+    }
+  );
+
+
+/* =========================================================
+   READY
+   ========================================================= */
+
+$("readyButton")
+  .addEventListener(
+    "click",
+    startBattle
+  );
+
+
+function startBattle(){
+
+  const p1=
+    getItem(
+      state.colosseum.p1
+    );
+
+  const p2=
+    getItem(
+      state.colosseum.p2
+    );
+
+
+  if(!p1 || !p2){
+
+    showToast(
+      "Choose both P1 and P2 first."
+    );
+
+    return;
+
+  }
+
+
+  if(p1.id===p2.id){
+
+    showToast(
+      "A Softoy cannot battle itself."
+    );
+
+    return;
+
+  }
+
+
+  const winner=
+    Math.random()<.5
+      ? p1
+      : p2;
+
+
+  const loser=
+    winner.id===p1.id
+      ? p2
+      : p1;
+
+
+  const points=
+    2+
+    Math.floor(
+      Math.random()*7
+    );
+
+
+  $("battleP1")
+    .textContent=
+    p1.name;
+
+
+  $("battleP2")
+    .textContent=
+    p2.name;
+
+
+  $("battleP1")
+    .classList.remove(
+      "winner",
+      "loser"
+    );
+
+
+  $("battleP2")
+    .classList.remove(
+      "winner",
+      "loser"
+    );
+
+
+  $("battleResult")
+    .textContent=
+    "⚔️ The battle begins...";
+
+
+  $("battleResultModal")
+    .classList.add(
+      "show"
+    );
+
+
+  setTimeout(
+    () => {
+
+      $("battleResult")
+        .textContent=
+        "⚔️ FIGHT!";
+
+    },
+    700
+  );
+
+
+  setTimeout(
+    () => {
+
+      const winnerBox=
+                winner.id===p1.id
+          ? $("battleP1")
+          : $("battleP2");
+
+
+      const loserBox=
+        loser.id===p1.id
+          ? $("battleP1")
+          : $("battleP2");
+
+
+      winnerBox
+        .classList.add(
+          "winner"
+        );
+
+
+      loserBox
+        .classList.add(
+          "loser"
+        );
+
+
+      $("battleResult")
+        .textContent=
+        "🏆 "+
+        winner.name+
+        " wins! +"+
+        points+
+        " points";
+
+
+      finishBattle(
+        winner,
+        loser,
+        points
+      );
+
+    },
+    1700
+  );
+
+}
+
+
+/* =========================================================
+   FINISH BATTLE
+   ========================================================= */
+
+function finishBattle(
+  winner,
+  loser,
+  points
+){  
+  awardUnexpectedAchievement(
+    winner,
+    loser
+  );
+
+  winner.points=
+    (winner.points||0)+
+    points;
+
+
+  winner.colosseumWins=
+    (winner.colosseumWins||0)+
+    1;
+
+
+  winner.colosseumStreak=
+    (winner.colosseumStreak||0)+
+    1;
+
+    loser.colosseumStreak=0;
+  
+  state.colosseum.wins[
+    winner.id
+  ]=
+    (state.colosseum.wins[
+      winner.id
+    ]||0)+1;
+
+
+  transaction(
+    winner.name+
+    " won a Colosseum battle",
+    winner.id,
+    points,
+    "colosseum"
+  );
+
+
+  state.colosseum.summonAvailable=
+    false;
+
+  state.colosseum.summonStarted=
+    false;
+
+
+  /*
+   * Six-hour cooldown.
+   */
+
+  state.colosseum.cooldownUntil=
+    Date.now()+
+    6*60*60*1000;
+
+
+  state.colosseum.p1=null;
+
+  state.colosseum.p2=null;
+
+
+  save();
+
+  renderAll();
+
+  confetti();
+
+  celebrationSound();
+
+
+  if(
+    winner.colosseumStreak>=5
+  ){
+
+    showToast(
+      "🏆 Undefeated unlocked!"
+    );
+
+  }
+
+
+  setTimeout(
+    () => {
+
+      $("battleResultModal")
+        .classList.remove(
+          "show"
+        );
+
+
+      $("battlePanel")
+        .classList.add(
+          "hidden"
+        );
+
+
+      $("eventButton")
+        .classList.remove(
+          "hidden"
+        );
+
+
+      renderColosseum();
+
+    },
+    3000
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT BACKUP
+   ========================================================= */
+
+$("exportBackup")
+  .addEventListener(
+    "click",
+    exportBackup
+  );
+
+
+function exportBackup(){
+
+  const backup={
+
+    app:"Softoy Ranking",
+
+    version:state.version,
+
+    exportedAt:
+      new Date().toISOString(),
+
+    data:state
+
+  };
+
+
+  const blob=
+    new Blob(
+      [
+        JSON.stringify(
+          backup,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  const url=
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link=
+    document.createElement(
+      "a"
+    );
+
+  link.href=url;
+
+  link.download=
+    "Softoy-Ranking-Backup-"+
+    dateKey(new Date())+
+    ".json";
+
+  link.click();
+
+
+  URL.revokeObjectURL(
+    url
+  );
+
+
+  showToast(
+    "📦 Backup exported."
+  );
+
+}
+
+
+/* =========================================================
+   IMPORT BACKUP
+   ========================================================= */
+
+$("importBackup")
+  .addEventListener(
+    "click",
+    () => {
+
+      $("backupFile").click();
+
+    }
+  );
+
+
+$("backupFile")
+  .addEventListener(
+    "change",
+    event => {
+
+      const file=
+        event.target.files[0];
+
+      if(!file)
+        return;
+
+
+      const reader=
+        new FileReader();
+
+
+      reader.onload=
+        () => {
+
+          try{
+
+            const backup=
+              JSON.parse(
+                reader.result
+              );
+
+
+            const imported=
+              backup.data;
+
+
+            if(
+              !imported ||
+              !Array.isArray(
+                imported.items
+              )
+            ){
+
+              throw new Error(
+                "Invalid backup"
+              );
+
+            }
+
+
+            const confirmed=
+              confirm(
+                "Restore this backup?\n\n"+
+                "Your current data will be replaced."
+              );
+
+
+            if(!confirmed)
+              return;
+
+
+            state={
+
+              ...state,
+
+              ...imported,
+
+              settings:{
+                ...state.settings,
+                ...(imported.settings||{})
+              },
+
+              weekly:{
+                ...state.weekly,
+                ...(imported.weekly||{})
+              },
+
+              colosseum:{
+                ...state.colosseum,
+                ...(imported.colosseum||{})
+              }
+
+            };
+
+
+            save();
+
+            renderAll();
+
+            showToast(
+              "📥 Backup restored."
+            );
+
+
+          }catch(error){
+
+            alert(
+              "That file is not a valid Softoy Ranking backup."
+            );
+
+          }
+
+        };
+
+
+      reader.readAsText(
+        file
+      );
+
+
+      event.target.value="";
+
+    }
+  );
+
+
+/* =========================================================
+   HISTORY
+   ========================================================= */
+
+$("showHistory")
+  .addEventListener(
+    "click",
+    () => {
+
+      renderHistory();
+
+      $("historyModal")
+        .classList.add(
+          "show"
+        );
+
+    }
+  );
+
+
+function renderHistory(){
+
+  const list=
+    $("historyList");
+
+  list.innerHTML="";
+
+
+  if(
+    !state.transactions.length
+  ){
+
+    list.textContent=
+      "No transactions yet.";
+
+    return;
+
+  }
+
+
+  state.transactions.forEach(
+    tx => {
+
+      const row=
+        document.createElement(
+          "div"
+        );
+
+      row.className=
+        "archive-row";
+
+
+      const date=
+        new Date(
+          tx.time
+        );
+
+
+      row.innerHTML=`
+
+        <strong>
+          ${escapeHTML(tx.description)}
+        </strong>
+
+        <br>
+
+        <small>
+          ${date.toLocaleString()}
+        </small>
+
+        <br>
+
+        <small>
+
+          ${
+            tx.undone
+              ? "↩️ Transaction reversed"
+              : tx.type==="colosseum"
+                ? "🏟️ Colosseum result"
+                : "➕ Point change"
+          }
+
+        </small>
+
+      `;
+
+
+      if(!tx.undone){
+
+        const undo=
+          document.createElement(
+            "button"
+          );
+
+        undo.className=
+          "button gray";
+
+        undo.style.marginTop=
+          "7px";
+
+        undo.textContent=
+          "↩️ Undo";
+
+
+        undo.onclick=
+          () =>
+            undoTransaction(
+              tx.id
+            );
+
+
+        row.appendChild(
+          undo
+        );
+
+      }
+
+
+      list.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+$("resetData")
+  .addEventListener(
+    "click",
+    () => {
+
+      const first=
+        prompt(
+          "This will permanently delete your Softoy data.\n\n"+
+          "Type RESET to continue."
+        );
+
+
+      if(first!=="RESET"){
+
+        showToast(
+          "Reset cancelled."
+        );
+
+        return;
+
+      }
+
+
+      const second=
+        confirm(
+          "⚠️ FINAL WARNING\n\n"+
+          "Delete all Softoys, points, photos, achievements, "+
+          "weekly records, transactions and Colosseum data?"
+        );
+
+
+      if(!second)
+        return;
+
+
+      localStorage.removeItem(
+        STORAGE_KEY
+      );
+
+      location.reload();
+
+    }
+  );
+
+
+/* =========================================================
+   MANUAL SAVE
+   ========================================================= */
+
+$("manualSave")
+  .addEventListener(
+    "click",
+    () => {
+
+      if(save()){
+
+        state.settings.lastManualSave=
+          new Date().toISOString();
+
+        save();
+
+        showToast(
+          "💾 Progress saved!"
+        );
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   PERIODIC SAVE
+   ========================================================= */
+
+setInterval(
+  () => {
+
+    save();
+
+    weeklyCheck();
+
+    checkEvent();
+
+    renderColosseum();
+
+  },
+  30000
+);
+
+
+/* =========================================================
+   RENDER ALL
+   ========================================================= */
+
+function renderAll(){
+
+  weeklyCheck();
+
+  checkEvent();
+
+  renderLeaderboard();
+
+  renderWeekly();
+
+  renderAchievements();
+
+  renderColosseum();
+
+}
+
+
+/* =========================================================
+   INITIALISE
+   ========================================================= */
+
+load();
+
+weeklyCheck();
+
+checkEvent();
+
+renderAll();
+
+
+/* =========================================================
+   SAVE WHEN PAGE HIDDEN
+   ========================================================= */
+
+document.addEventListener(
+  "visibilitychange",
+  () => {
+
+    if(
+      document.visibilityState===
+      "hidden"
+    ){
+
+      save();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SAVE BEFORE LEAVING
+   ========================================================= */
+
+window.addEventListener(
+  "beforeunload",
+  save
+);
+
+
+})();
+
+</script>
+
+</body>
+</html>
